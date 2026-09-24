@@ -1,0 +1,62 @@
+Excel Notes:-
+
+1 - VLOOKUP 
+2 - INDEX, MATCH - When VLOOKUP doesnot work
+Example:-  
+	Data:
+	A2:A6 → Employee Names
+	B2:B6 → Salary
+	
+	=INDEX(B2:B6, MATCH("Rahul", A2:A6, 0))
+Meaning:
+	MATCH finds the row where “Rahul” is
+	INDEX returns the salary from that same row
+3 - PIVOT Table- for Aggregation 
+4 - Condition Formatinng
+5 - Filtering the value
+6 - SUMIF
+Example :-
+Goal: Sum sales where Region = “East”.
+
+Data:
+A2:A6 → Region
+B2:B6 → Sales
+Formula-
+=SUMIF(A2:A6, "East", B2:B6)
+7 - SUMIFS
+Example:-
+Goal: Sum sales where
+
+Region = “East”
+
+Product = “Laptop”
+
+Data:
+A2:A6 → Region
+B2:B6 → Product
+C2:C6 → Sales
+Formula-
+=SUMIFS(C2:C6, A2:A6, "East", B2:B6, "Laptop")
+8 - COUNTIF
+Example:-
+Goal: Count how many employees have “HR” department.
+
+Data:
+A2:A10 → Department
+Formula-
+=COUNTIF(A2:A10, "HR")
+9 - COUNTIFS
+Goal: Count employees where
+
+Department = “HR”
+
+Status = “Active”
+
+Data:
+A2:A10 → Department
+B2:B10 → Status
+Formula-
+=COUNTIFS(A2:A10, "HR", B2:B10, "Active")
+
+10 - Filter - Lets say you have a bu of data present in one sheet and now you want to know or do some analysis on them one by one
+

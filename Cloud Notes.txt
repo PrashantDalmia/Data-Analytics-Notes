@@ -1,0 +1,116 @@
+🖥️ Compute
+
+Amazon EC2 → Virtual servers in the cloud to run apps/websites, choose OS, CPU, memory, and scale on demand. 
+Alternatives: 
+Azure Virtual Machines, 
+GCP Compute Engine, 
+Apache Hadoop YARN/Kubernetes.
+
+AWS Lambda → Serverless compute that runs code when triggered, often used with Step Functions. 
+Alternatives: 
+Azure Functions, 
+GCP Cloud Functions, 
+Apache OpenFaaS.
+
+AWS Step Functions → Orchestrates workflows across multiple AWS services using JSON-based Amazon States Language.
+Alternatives: 
+Azure Logic Apps/Durable Functions, 
+GCP Cloud Workflows, 
+Apache Airflow/Oozie.
+
+Amazon EMR (Elastic MapReduce) → Managed Hadoop/Spark cluster to process large datasets in a distributed system. 
+Alternatives: 
+Azure HDInsight/Synapse Spark, 
+GCP Dataproc, 
+Apache Hadoop/Spark.
+
+💾 Storage & Databases
+
+Amazon S3 (Simple Storage Service) → Scalable, durable object storage for any data (files, backups, videos). 
+Alternatives: 
+Azure Blob Storage, 
+GCP Cloud Storage, 
+Apache HDFS/MinIO.
+
+Amazon Redshift → Cloud Data Warehouse for analytics on structured data. 
+Alternatives: 
+Azure Synapse Analytics, 
+GCP BigQuery, 
+Apache ClickHouse/Druid.
+
+Amazon DynamoDB → Fully managed, serverless NoSQL database with auto-scaling. 
+Alternatives: 
+Azure Cosmos DB, 
+GCP Firestore/Bigtable, 
+Apache Cassandra/HBase.
+
+Amazon RDS (Relational Database Service) → Managed relational databases (MySQL, PostgreSQL, Oracle, SQL Server). 
+Alternatives: 
+Azure SQL Database, 
+GCP Cloud SQL/AlloyDB, 
+PostgreSQL/MySQL (OSS).
+
+
+🔑 Security & Identity
+
+AWS IAM (Identity and Access Management) → Manages users, roles, and permissions across AWS resources. 
+Alternatives: 
+Azure Active Directory, 
+GCP Cloud IAM, 
+Apache Ranger/Knox.
+
+
+📊 Analytics & Query
+
+Amazon Athena → Serverless SQL query service for analyzing S3 data directly. 
+Alternatives: 
+Azure Synapse Serverless SQL, 
+GCP BigQuery, 
+Apache Presto/Trino/Drill.
+
+AWS Glue → ETL & data integration service that catalogs metadata and transforms raw data. 
+Alternatives: 
+Azure Data Factory, 
+GCP Dataflow, 
+Apache NiFi/Spark Streaming.
+
+Amazon QuickSight → Cloud-native BI and dashboarding tool. 
+Alternatives: 
+Azure Power BI, 
+GCP Looker/Data Studio, 
+Apache Superset/Metabase.
+
+
+📡 Messaging & Events
+
+Amazon SNS (Simple Notification Service) → Pub/Sub messaging service to send notifications (email, SMS, push). 
+Alternatives: 
+Azure Service Bus/Event Grid, 
+GCP Pub/Sub, 
+Apache Kafka.
+
+Amazon SQS (Simple Queue Service) → Fully managed message queuing for decoupled systems. 
+Alternatives: 
+Azure Service Bus Queue, 
+GCP Pub/Sub (pull mode), 
+Apache Kafka/RabbitMQ.
+
+Amazon EventBridge → Event bus for routing events across services and apps. 
+Alternatives: 
+Azure Event Grid, 
+GCP Eventarc, 
+Apache Kafka Streams/Flink.
+
+🤖 Machine Learning
+
+Amazon SageMaker → End-to-end ML platform for building, training, and deploying models. 
+Alternatives: 
+Azure Machine Learning, 
+GCP Vertex AI, 
+Apache MLlib/TensorFlow/PyTorch.
+
+AWS Glue Data Catalog → Central metadata catalog that describes datasets across sources. 
+Alternatives: 
+Azure Purview, 
+GCP Data Catalog, 
+Apache Atlas.

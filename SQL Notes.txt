@@ -1,0 +1,179 @@
+SQL Notes:-
+
+1 - Colease - (First non null value) - COALEASE(value1, value2,value3,....)
+2 - In order to add new column in the table , we use ALTER TABLE employees ADD COLUMN department VARCHAR(50), If we want to add a column in the Select Statement, we can use CASE 
+3 - What are constraints? Rules applied to columns such as PRIMARY KEY, UNIQUE, NOT NULL, CHECK, FOREIGN KEY.
+4 - What is a Primary Key? - A column (or set of columns) that uniquely identifies each row and does not allow NULL or duplicate values.
+5 - What is the difference between DELETE, TRUNCATE, and DROP? 
+	DELETE → Removes rows, can use WHERE. (DML)
+    Example - DELETE from table where column = "PR"
+	TRUNCATE → Removes all rows, cannot use WHERE. Faster. (DDL)
+    Example - TRUNCATE table table_name
+	DROP → Removes entire table. (DDL), Cannot roll back
+	Example - DROP tablle table_name
+8 -  What is Normalization? A process of structuring data to reduce redundancy and improve consistency.Normal forms: 1NF, 2NF, 3NF, BCNF.
+9 - What is a View? A virtual table created using a SELECT query. It stores no data; always pulls fresh data from base tables. 
+     Example - CREATE VIEW View_name AS Select Statement
+10 - Materialized View - Stores data physically (faster), needs refresh
+11 - What is an Index? An index is a data structure (usually B-tree) that makes SELECT queries faster.
+	 Example - CREATE INDEX idx_employee_salary ON employees(salary);
+	 Note - Indexes slow down write operations: INSERT,UPDATE,DELETE Because the index itself must update.
+12 - Stored Procedure - CREATE PROCEDURE get_emp_details(emp_id INT)
+	✔ Perform IF, CASE, loops, conditions
+	Stored procs can behave like code.
+	✔ Perform multiple SQL statements together
+	SELECT + UPDATE + INSERT + DELETE in 1 procedure.
+	✔ Implement business logic
+	Example: calculate bonus, generate monthly summaries.
+	✔ Improve performance with precompiled execution plans
+	Stored procedures execute faster.
+	✔ Provide security — expose only a procedure, hide raw tables
+	Users don’t need direct access to underlying tables.
+13 - ROW_NUMBER(), RANK(), LEAD(), LAG(), SUM() OVER(), AVG() OVER().
+14 - 14. What is a Correlated Subquery? A subquery that depends on the outer query row-by-row. Runs once per row, making it slower.
+	Example - Find employees whose salary is greater than the average salary of their department.
+
+			SELECT e.employee_id, e.name, e.department, e.salary
+			FROM employees e
+			WHERE e.salary >
+				  (
+					SELECT AVG(e2.salary)
+					FROM employees e2
+					WHERE e2.department = e.department
+				  );
+15 - Explain ACID properties.
+Atomicity → All or nothing
+Consistency → Data stays valid
+Isolation → Transactions don’t affect each other
+Durability → Data persists after commit
+19 -  Explain Query Optimization Techniques.
+	Use indexes
+	Avoid SELECT *
+	Use proper filters
+	Avoid unnecessary DISTINCT
+	Use EXISTS instead of IN when needed
+	Use CTE instead of repeated subqueries
+	Analyze execution plan
+20 - What is Partitioning in SQL? Splitting a table into smaller logical pieces for performance.ypes: Range, List, Hash, Composite.
+21 - How does indexing slow down write operations? Every INSERT/UPDATE/DELETE must update the index tree, adding overhead.
+22 - EXISTS - EXISTS evaluates row-by-row and stops on first match → often faster.
+23 - Pivot rows to columns (difficult SQL transformation)
+		Answer:
+			SELECT employee_id,
+				   SUM(CASE WHEN quarter='Q1' THEN sales END) AS Q1,
+				   SUM(CASE WHEN quarter='Q2' THEN sales END) AS Q2,
+				   SUM(CASE WHEN quarter='Q3' THEN sales END) AS Q3,
+				   SUM(CASE WHEN quarter='Q4' THEN sales END) AS Q4
+			FROM sales_data
+			GROUP BY employee_id;
+24 - Find mismatched records between two tables
+	Answer:
+			SELECT *
+			FROM table1 t1
+			FULL OUTER JOIN table2 t2
+			  ON t1.id = t2.id
+			WHERE t1.id IS NULL OR t2.id IS NULL;
+25 - Date/Time related questions:-
+A)Running total but restart every month
+Answer:
+SELECT
+    order_id,
+    order_date,
+    amount,
+    SUM(amount) OVER(
+        PARTITION BY DATE_TRUNC('month', order_date)
+        ORDER BY order_date
+    ) AS monthly_running_total
+FROM orders;
+B)Moving average over last 7 days
+Answer:
+		SELECT date,
+			   amount,
+			   AVG(amount) OVER(
+				   ORDER BY date
+				   ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+			   ) AS moving_avg_7day
+		FROM sales;
+
+C) Find Customers with NO transactions in the last 3 months
+Answer:
+		SELECT c.customer_id, c.name
+		FROM customers c
+		LEFT JOIN transactions t
+			ON c.customer_id = t.customer_id
+		GROUP BY c.customer_id, c.name
+		HAVING MAX(t.txn_date) < CURRENT_DATE - INTERVAL '3 months'
+		   OR MAX(t.txn_date) IS NULL;
+D) Find Inactive Customer (NoOrder in last 6 months)
+Answer:
+		SELECT CUSTOMER ID, MAX(ORDER DATE) 
+		FROM table 
+		GROUP BY CUSTOMER ID 
+		HAVING MAX(ORDER DATE) < CUREENT DATE- INTERVAL( 6 MONTHS)
+E) Get all orde plaed between 9 to 16 
+Answer:
+		SELECT * 
+		FROM table 
+		WHERE EXTRACT(Hours from order_date) 
+		BETWEEN 9 and 16
+26 - Notes - When we use DISTINCT , it applies to all the Columns present in the Select. We need to write it just once to get the unique row of the columns written
+27 - DISTINCT treats NULL as unique value, All NULL collapse to a single NULL in results
+28 - Order of Execution in SQL:-
+		FROM(Including JOIN , ON)
+		WHERE(Row Filter)
+		GROUP BY (AGGREGATION)
+		HAVING( FILTERING GROUP)
+		SELECT
+		DISTINCT
+		ORDER BY
+		LIMIT,OFFSET
+29 - If we have WINDOWS Function written so, that will happen first before the SELECT but CASE statement wors inside SELECT only
+30 - In JOIN, if we are doing MULTIPLE JOINS, the FIRST JOIN happens then result of first JOIN would JOIN with the third TABLE
+31 - EXTRACT part of Date/Time
+		YEAR - EXTRACT(YEAR from COLUMN) , YEAR(COLUMN)
+		MONTH,DAY - same as YEAR
+32- Add DATE 
+		DATEADD('days',5,order_date)
+33 - Date Formatting
+		CAST(date_column as DATE)
+		DATE_FORMAT(NOW(), '%Y-%m-%D)
+34 - Remember Interval thing
+		CURDATE() - INTERVSL(7 Days)
+35 - Notes - If we are using ROW_NUMBER() and PARTITION  BY Employee and ORDER BY Sales Amount where Employee are same and sales Amount is same too, The ROW_NUMBER would be in random order
+36 - Self JOIN - When table joins itselfs
+		Use cases:
+				comparing one row to another row in the same table	
+				finding previous/next values
+				finding duplicates	
+				finding hierarchical relationships (manager → employee)
+A) Employee Manager Mapping
+
+| emp_id | name  | manager_id |
+| ------ | ----- | ---------- |
+| 1      | Asha  | NULL       |
+| 2      | Rohan | 1          |
+| 3      | Meera | 1          |
+| 4      | Kunal | 2          |
+
+SELECT 
+    e.name AS employee,
+    m.name AS manager
+FROM employees e
+LEFT JOIN employees m
+    ON e.manager_id = m.emp_id;
+
+| employee | manager |
+| -------- | ------- |
+| Rohan    | Asha    |
+| Meera    | Asha    |
+| Kunal    | Rohan   |
+
+
+B) Find Employee who earns more than there Manager 
+SELECT 
+    e.name AS employee,
+    m.name AS manager
+FROM employees e
+LEFT JOIN employees m
+    ON e.manager_id = m.emp_id;
+	where E.salary > M.Salary

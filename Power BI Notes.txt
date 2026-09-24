@@ -1,0 +1,410 @@
+1 - Data Connectivity
+
+Direct Query
+- Custom SQL can be written for Databasess
+- Data seats at the source level and only schema is present inside Power BI
+- Can manage huge amount of data
+- little slower
+Import
+- Custom SQL can be written for Databasess
+- Data sets are present inside Power BI
+- Can manage little less data
+- fast version
+
+2 - Power Query / M Language (ETL Layer)
+
+Power Query is the ETL layer of Power BI used for connecting, cleaning, shaping, and transforming data before loading it into the data model. It uses the M language, a functional language designed for data transformation.
+
+✔ Key Concepts (Short Explanation + One-Liners)
+
+1. Query Editor-The interface in Power BI where you connect to data, clean it, and apply transformations
+2. Applied Steps- Every transformation you make is recorded as a step in sequence.
+3. M Language Basics - M is a functional programming language used to write and customize query logic.
+4. Query Folding - Power Query pushes transformations back to the source system (SQL, etc.) to improve performance.
+5. Merge & Append - Merge = join tables; Append = union tables.
+6. Unpivot / Pivot - Pivot converts rows to columns; Unpivot converts columns into rows.
+7. Data Profiling (Column Quality, Distribution) - Quick overview of data quality and distribution inside Power Query.
+8. Parameters - Variables that make queries dynamic and reusable.
+9. Custom Columns - Columns created with formulas to derive new values.
+10. Group By - Summarizes data similar to SQL GROUP BY.
+11. Incremental Refresh Setup - Loads only new and changed data instead of full refresh every time.
+12. Understanding Lazy Evaluation - M evaluates expressions only when required, improving performance.
+
+3 - Power BI Data Modeling
+
+Star Schema – A simple model with one fact table connected to multiple denormalized dimension tables.
+Snowflake Schema – A normalized version of star schema where dimension tables are split into sub-dimensions.
+Fact vs Dimension – Facts store numeric, transactional data; dimensions store descriptive attributes for filtering and grouping.
+Granularity – The lowest level of detail captured in the fact table (e.g., daily sales vs hourly sales).
+Surrogate Keys – Artificial, system-generated keys used to uniquely identify dimension rows.
+Cardinality – The relationship type between tables (One-to-one, One-to-many, Many-to-one, Many-to-many).
+Row-level Relationships – How individual rows in one table map to rows in another through keys.
+Cross-Filter Direction – Determines how filters flow between tables (Single or Both direction).
+Active vs Inactive Relationships – Active is used by default in calculations; inactive is only used when explicitly invoked using USERELATIONSHIP().
+Many-to-Many Relationships – Relationship where both sides contain duplicate key values, requiring special handling in DAX.
+Bridge Tables – Intermediate tables used to resolve many-to-many relationships or handle shared dimensions.
+
+4 - Model optimization
+
+Avoid bi-directional relationships
+Use surrogate keys
+Normalize dimensions
+Reduce high-cardinality columns
+Reduce row count before loading
+Using summary Table
+
+5 - Important Visualizations & Dashboarding
+
+Bar/Column charts
+Line charts
+Area chart
+Table, Matrix
+Slicers
+Tooltip
+Cards, KPIs
+Maps
+
+✔ Advanced visuals
+
+Decomposition tree
+Key Influencer
+Field parameters
+Bookmarks & Buttons
+Drillthrough
+Page navigation
+Custom visuals
+Small multiples
+Conditional formatting
+
+6 - Power BI Service
+
+✔ Key features
+
+Publish reports
+Apps
+Workspaces
+Sharing methods
+Share link
+App publishing
+Row-Level Security-based sharing
+Embed in Teams
+
+7 - Security & Governance
+
+✔ Row-Level Security (RLS)
+✔ Object-Level Security (OLS)
+Hide tables/columns based on role
+
+✔ Data Governance
+
+Sensitivity labels
+Endorsement (certified datasets, promoted datasets)
+Version control with OneDrive / SharePoint
+Lineage view
+Dataflows governance
+Performance Optimization
+
+✔ Report Performance
+
+Reduce visuals per page
+Disable auto date/time
+Optimize DAX
+Remove unnecessary columns
+Use aggregations
+Star model over flat model
+Performance Analyzer tool
+
+
+✔ Data model performance
+
+Reduce cardinality
+Use integer keys
+Avoid calculated columns (push to Power Query instead)
+Use measures, not columns, whenever possible
+
+8 - Important DAX Functions with example and meaning
+
+1️⃣ AGGREGATION FUNCTIONS (Basics)
+
+SUM() – Add numbers
+SUM(Sales[Amount])
+AVERAGE() – Average of a column
+AVERAGE(Sales[Amount])
+COUNTROWS() – Count rows
+COUNTROWS(Sales)
+DISTINCTCOUNT() – Count unique items
+DISTINCTCOUNT(Customer[ID])
+SUMX() – Row-by-row then sum
+SUMX(Sales, Sales[Qty] * Sales[Price])
+
+2️⃣ FILTER & CONTEXT FUNCTIONS (MOST IMPORTANT)
+
+CALCULATE() – Change filters
+CALCULATE(SUM(Sales[Amount]), Region="East")
+FILTER() – Keep rows that match condition
+FILTER(Sales, Sales[Amount] > 1000)
+ALL() – Remove all filters
+CALCULATE(SUM(Sales[Amount]), ALL(Sales))
+ALLEXCEPT() – Remove all filters except chosen columns
+CALCULATE(SUM(Sales[Amount]), ALLEXCEPT(Sales, Sales[Product]))
+ALLSELECTED() – Respect only user selections
+CALCULATE(SUM(Sales[Amount]), ALLSELECTED(Sales))
+VALUES() – Unique list of values
+VALUES(Product[Category])
+DISTINCT() – Distinct table
+DISTINCT(Customer[City])
+REMOVEFILTERS() – Clear filters (newer than ALL)
+CALCULATE(SUM(Sales[Amount]), REMOVEFILTERS(Sales))
+KEEPFILTERS() – Prevent filters from being overwritten
+CALCULATE(SUM(Sales[Amount]), KEEPFILTERS(Sales[Amount] > 5000))
+SELECTEDVALUE() – Return selected value
+SELECTEDVALUE(Product[Category])
+TREATAS() – Apply filter from one table to another
+CALCULATE(SUM(Sales[Amount]), TREATAS(VALUES(Target[City]), Sales[City]))
+
+3️⃣ RELATIONSHIP FUNCTIONS
+
+RELATED() – Bring column from dimension table
+RELATED(Product[Category])
+RELATEDTABLE() – All child rows
+COUNTROWS(RELATEDTABLE(Sales))
+USERELATIONSHIP() – Activate inactive relationship
+CALCULATE(SUM(Sales[Amount]), USERELATIONSHIP(Date[FY], Sales[FY]))
+CROSSFILTER() – Change filter direction
+CROSSFILTER(Product[ID], Sales[ProductID], BOTH)
+
+4️⃣ TIME INTELLIGENCE FUNCTIONS
+
+DATEADD() – Shift dates (+/- Month, Year)
+DATEADD(Date[Date], -1, YEAR)
+SAMEPERIODLASTYEAR() – LY same period
+CALCULATE(SUM(Sales[Amount]), SAMEPERIODLASTYEAR(Date[Date]))
+TOTALYTD() – Year-to-date
+TOTALYTD(SUM(Sales[Amount]), Date[Date])
+DATESYTD() – Table of all YTD dates
+CALCULATE(SUM(Sales[Amount]), DATESYTD(Date[Date]))
+
+5️⃣ ITERATOR FUNCTIONS (X FUNCTIONS)
+
+SUMX() – Row-by-row
+SUMX(Sales, Sales[Qty] * Sales[Price])
+AVERAGEX() – Row-by-row average
+AVERAGEX(Sales, Sales[Profit])
+MINX(), MAXX() – Row-by-row min/max
+MAXX(Sales, Sales[Amount] - Sales[Cost])
+
+6️⃣ LOGIC FUNCTIONS
+
+IF() – Basic condition
+IF(Sales[Amount] > 5000, "High", "Low")
+SWITCH() – Multiple conditions
+SWITCH(TRUE(),
+Sales[Amount] > 5000, "High",
+Sales[Amount] > 2000, "Medium",
+"Low"
+)
+
+
+7️⃣ RANK & MATH
+
+RANKX() – Rank values
+RANKX(ALL(Product), SUM(Sales[Amount]))
+DIVIDE() – Safe divide (no error on zero)
+DIVIDE(SUM(Sales[Profit]), SUM(Sales[Revenue]))
+8️⃣ VARIABLES (Clean Code)
+VAR … RETURN – Store & reuse values
+VAR Total = SUM(Sales[Amount])
+RETURN Total / 1000
+
+9 - Interview Questions
+
+1. Measure vs Calculated Column
+
+Calculated Column:
+
+Computed row-by-row during data refresh.
+
+Stored in the model (consumes memory).
+
+Used for slicing/filtering.
+
+
+Measure:
+
+Calculated at query time based on filter context.
+
+Not stored; lightweight.
+
+Used for aggregations in visuals.
+
+
+When asked in interview:
+
+> Use column when result is row-level and fixed. Use measure when result changes with filters.
+
+2. Active vs Inactive Relationship
+
+Active Relationship:
+
+Power BI uses it automatically for filtering.
+
+
+Inactive Relationship:
+
+Exists but not used unless explicitly activated.
+
+
+USERELATIONSHIP()
+
+Used inside a measure to activate the inactive relationship.
+
+Sales Using OrderDate :=
+CALCULATE([Total Sales], USERELATIONSHIP(Dates[Date], Orders[OrderDate]))
+
+3. ALL vs ALLEXCEPT vs REMOVEFILTERS
+
+ALL()
+
+Removes all filters from selected table/columns.
+
+
+ALLEXCEPT()
+
+Removes filters except the columns specified (keeps those filters).
+
+
+REMOVEFILTERS()
+
+Equivalent to ALL but makes intent clearer in newer DAX.
+
+
+Interview tip:
+→ Use ALL for grand totals, percent of total, ranking.
+
+4. CALCULATE + Filter Context
+
+CALCULATE() changes or overrides filter context before evaluating the expression.
+
+Sales LY :=
+CALCULATE([Total Sales], SAMEPERIODLASTYEAR(Date[Date]))
+
+CALCULATE is the only function that converts row context → filter context.
+
+5. Row Context vs Filter Context
+
+Row Context
+
+Works row by row (e.g., Calculated Columns, iterators like SUMX).
+
+
+Filter Context
+
+Filters applied by slicers, page/visual filters, CALCULATE.
+
+
+Famous interview line:
+
+> Row context = "current row". Filter context = "current filters".
+
+6. Aggregations Table (Performance Feature)
+
+Create a smaller aggregated table on top of a large fact table.
+
+Power BI uses composite models to query the aggregated table first.
+
+Boosts DirectQuery performance massively.
+
+7. Visual vs Page vs Report Level Filters
+
+Visual-Level Filters – Affect only that visual.
+Page-Level Filters – Affect all visuals on that page.
+Report-Level Filters – Affect entire report.
+
+⚡ Performance / Architecture Topics
+
+8. Import vs DirectQuery
+
+Import Mode:
+Data stored in VertiPaq (in-memory).
+Fastest performance.
+Best for complex calculations.
+
+DirectQuery:
+Data stays in source; query runs at runtime.
+Slower; limited DAX functions.
+Good for large real-time datasets.
+
+9. DirectQuery Limitations
+
+1M row limit per visual.
+Many DAX functions not allowed.
+Slower because each interaction triggers a DB query.
+No calculated columns (unless using Dual).
+Relationships → often single-direction.
+
+10. Why Star Schema?
+
+Simple relationships.
+Better compression.
+Avoids ambiguity and circular relationships.
+Works best with VertiPaq engine.
+
+11. VertiPaq Compression
+
+Columnar storage + dictionary encoding + run-length encoding.
+Repeats compress extremely well.
+Smaller model → faster calculations.
+
+Tip:
+→ Reduce cardinality = better compression (e.g., split DateTime into Date + Time).
+
+12. Slow Visuals Troubleshooting
+
+Check high cardinality columns in visuals.
+Replace calculated columns with measures.
+Avoid complex nested CALCULATE.
+Use SUMX/MINX carefully (iterators slow).
+Remove unnecessary fields from visuals.
+Limit DirectQuery visuals or switch to Import.
+
+➕ Extra Important Topics (Often Asked)
+
+13. Waterfall Chart – What It Shows
+
+Shows how individual components increase or decrease a total value.
+
+Used for:
+✔ Profit breakdown
+✔ Sales contribution
+✔ Year-over-Year change
+
+
+How it works:
+
+Start value (e.g., Revenue)
+Increases & decreases (e.g., region contributions)
+End value (final total)
+
+Interview line:
+
+> “Waterfall shows step-by-step movement from a start value to an end value.”
+
+14. SUM vs SUMX (Common Interview Question)
+
+SUM: simple column total (no row context).
+SUMX: loops row-by-row → creates row context.
+
+15. Filter Propagation
+
+Relationships dictate how filters move from dimension → fact tables.
+
+16. Cardinality
+
+Low cardinality = better performance.
+High cardinality = slow model (example: GUIDs, raw timestamps).
+
+17. Auto Date/Time – Why Disable
+
+Creates hidden date tables for every date column (heavy memory).
+
+Not useful for complex models.

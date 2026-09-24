@@ -1,0 +1,447 @@
+1. What are key Python modules used in data analytics and data engineering?
+
+Answer:
+
+Pandas – data cleaning, aggregation, transformation
+NumPy – numerical operations, arrays, matrix manipulation
+PySpark – distributed big data processing
+SQLAlchemy – connecting to and querying SQL databases
+boto3 / azure-storage / google-cloud-storage – for cloud file interaction
+requests – calling APIs and ingesting external data
+json / csv – parsing data formats
+logging – job logging in production pipelines
+os / pathlib – file handling and automation
+
+2. Explain the difference between Pandas and PySpark.
+
+Answer:
+
+Feature Pandas PySpark
+
+Execution Single machine (in-memory) Distributed across cluster
+Data Volume Suitable for smaller datasets (up to a few GBs) Handles terabytes/petabytes
+Performance Faster for small data Optimized for parallel computation
+Syntax Pythonic, simple Functional / SQL-like
+Use Case Analytics, exploration Data engineering, ETL pipelines
+
+
+✅ Example to say: “I use Pandas for small-scale analysis and PySpark for production-scale transformations.”
+
+3. What are DataFrames and why are they popular in analytics?
+
+Answer: A DataFrame is a 2D labeled data structure with rows and columns, like a SQL table.
+It allows:
+
+Easy filtering, grouping, aggregating, merging
+Works seamlessly with CSV, SQL, JSON
+Vectorized operations (fast computation)
+
+✅ Reason for popularity: Intuitive, flexible, integrates easily with visualization tools and databases.
+
+4. Difference between loc[] and iloc[] in Pandas?
+
+Answer:
+loc[] → Label-based selection (by column/row name)
+iloc[] → Index-based selection (by position)
+
+df.loc[0, 'column_name']    # by label
+df.iloc[0, 1]               # by index
+
+5. What is vectorization and why is it preferred in data processing?
+
+Answer:
+
+Vectorization means performing operations on entire arrays rather than iterating through elements.
+It uses NumPy’s C-level optimizations, making code much faster.
+
+Example:
+
+df['total'] = df['price'] * df['qty']  # vectorized
+
+vs
+
+for i in range(len(df)):               # slow loop
+    df['total'][i] = df['price'][i] * df['qty'][i]
+
+✅ Preferred for performance and readability in analytics pipelines.
+
+6. What are common data cleaning operations in Python?
+
+Answer:
+
+1. Handling missing values → fillna(), dropna()
+2. Removing duplicates → drop_duplicates()
+3. Normalizing case or trimming spaces → .str.lower(), .str.strip()
+4. Changing datatypes → astype()
+5. Handling outliers → using z-score or IQR methods
+6. Handling inconsistent formats → regex or date parsing (pd.to_datetime())
+
+7. How do you handle missing data in Pandas?
+
+Answer:
+
+Drop rows/columns: df.dropna()
+Fill with a constant: df.fillna(0)
+Forward/Backward fill: df.fillna(method='ffill')
+Group-wise imputation:
+df['sales'] = df.groupby('region')['sales'].transform(lambda x: x.fillna(x.mean()))
+
+✅ Choose method based on business context and data pattern.
+
+8. What is the difference between a Python list, tuple, and set?
+
+Type Mutable Ordered Allows Duplicates Syntax
+
+List ✅ ✅ ✅ [1,2,3]
+Tuple ❌ ✅ ✅ (1,2,3)
+Set ✅ ❌ ❌ {1,2,3}
+
+
+✅ Used in DE for fast lookups (set) and for storing immutable keys (tuple).
+
+9. What are Python comprehensions?
+
+Answer: Short syntax for creating lists/dicts/sets.
+Example:
+squares = [x2 for x in range(10) if x%2==0]
+
+✅ More readable and faster than using loops.
+
+10. How do you connect Python to a database?
+
+Answer: Use sqlalchemy or database-specific connectors.
+Example:
+
+import sqlalchemy as sa
+engine = sa.create_engine("mysql+pymysql://user:pass@host/db")
+df = pd.read_sql("SELECT * FROM sales", con=engine)
+
+✅ Interviewers may also ask: How do you handle connection pooling or credentials?
+– Use environment variables or keyvaults/secrets.
+
+11. How do you read and write data from cloud storage (S3 / Azure Blob)?
+
+Answer:
+
+AWS (boto3):
+
+import boto3
+s3 = boto3.client('s3')
+s3.upload_file('local.csv', 'my-bucket', 'data/local.csv')
+
+Azure (azure-storage-blob):
+
+from azure.storage.blob import BlobServiceClient
+blob_client = BlobServiceClient.from_connection_string(conn_str)
+blob_client.upload_blob(name='data.csv', data=open('data.csv', 'rb'))
+
+
+✅ Cloud interaction is a common data engineering question.
+
+12. What is multiprocessing in Python? Why is it used in ETL?
+
+Answer:
+Python’s multiprocessing allows you to run tasks in parallel using multiple CPU cores.
+Used in ETL to process files, API calls, or database inserts concurrently.
+
+Example:
+
+from multiprocessing import Pool
+with Pool(4) as p:
+    p.map(process_file, file_list)
+
+✅ Boosts performance in large-scale batch jobs.
+
+13. What are Python decorators and where are they used in data pipelines?
+
+Answer:
+
+Decorators modify behavior of functions without changing their code.
+Common in logging, timing, retry mechanisms.
+
+Example:
+
+def log_decorator(func):
+    def wrapper(*args, kwargs):
+        print("Running", func.__name__)
+        return func(*args, kwargs)
+    return wrapper
+
+@log_decorator
+def etl_job(): print("ETL running...")
+
+✅ Used for logging job execution or timing ETL steps.
+
+14. Explain difference between shallow and deep copy.
+
+Answer:
+
+Shallow Copy: Copies references → changes affect original.
+Deep Copy: Creates entirely new objects.
+
+
+import copy
+a = [[1,2],[3,4]]
+b = copy.deepcopy(a)
+b[0][0] = 99
+print(a)  # unchanged
+
+✅ Useful in data transformations to prevent unintended data mutation.
+
+15. What are Python generators and why are they important in ETL?
+
+Answer:
+Generators use yield to produce values lazily.
+They don’t load all data into memory — great for large datasets.
+
+Example:
+
+def read_large_file(file_path):
+    with open(file_path) as f:
+        for line in f:
+            yield line
+
+✅ Common DE use case: Reading large logs or streaming data efficiently.
+
+16. What is the difference between apply(), map(), and applymap() in Pandas?
+
+Method Applies to Works on Example
+
+map() Series Element-wise s.map(str.upper)
+apply() Series/DataFrame Function-wise df['col'].apply(len)
+applymap() DataFrame Element-wise df.applymap(lambda x: x*2)
+
+
+✅ Often asked to test functional transformation understanding.
+
+17. How do you optimize Python performance in data pipelines?
+
+Answer:
+
+Use vectorized operations instead of loops
+Use NumPy instead of native lists
+Use multiprocessing or concurrent.futures
+Cache intermediate results (functools.lru_cache)
+Reduce I/O using chunked reads/writes
+Use efficient formats (Parquet instead of CSV)
+Profile code using cProfile to find bottlenecks
+
+18. What are lambda functions and where are they useful?
+
+Answer: Anonymous one-line functions used in short transformations.
+
+Example:
+
+df['discount'] = df['price'].apply(lambda x: x*0.9)
+
+✅ Common in Pandas transformations and functional pipelines.
+
+19. What’s the difference between JSON and CSV when handling data in Python?
+
+Feature CSV JSON
+
+Structure Tabular Hierarchical
+Reading pd.read_csv() json.load()
+Size Smaller Larger due to keys
+Use Case Simple tables APIs, nested data
+
+
+✅ In ETL, JSON is used for APIs / configs; CSV for relational tabular data.
+
+20. How do you handle schema changes in incoming data using Python?
+
+Answer:
+
+Detect missing/new columns: set(df.columns).difference(expected_columns)
+Use dynamic column mapping or schema registry
+Log and handle unknown columns gracefully (e.g., store in error folder)
+Use Delta Lake or schema evolution tools (in Spark)
+
+
+✅ Asked in senior data engineering interviews — shows awareness of production challenges.
+
+Bonus: Python-Specific Data Engineering Questions
+
+Topic Question Key Point
+
+File I/O How do you read/write large CSVs efficiently? Use chunksize or PySpark
+Logging How do you log job progress? Use logging module, not print
+APIs How to paginate API data? Use loops + requests + offset
+Error handling How to make pipeline resilient? Try-except + retry + alerting
+Scheduling How do you automate Python jobs? Use Airflow, Cron, or Databricks Jobs
+
+21. Important Python Library Syntax to handle Data
+
+Here is a short, crisp cheat-sheet of the most important Pandas & NumPy operations (meaning + formula in one line).
+
+NumPy Cheat-Sheet (Meaning + Formula)
+
+1. Create array – Create numeric array
+`np.array([1,2,3])`
+
+2. Create range – Sequence of numbers
+`np.arange(start, stop, step)`
+
+3. Zeros/Ones – Array of only zeros/ones
+`np.zeros((r,c))`, `np.ones((r,c))`
+
+4. Random numbers – Generate random values
+`np.random.rand(n)` , `np.random.randint(low, high, size)`
+
+5. Reshape array – Change shape
+`arr.reshape(r, c)`
+
+6. Math operations – Element-wise calculations
+`arr1 + arr2`, `arr * 2`, `np.sqrt(arr)`, `np.log(arr)`
+
+7. Aggregations – Compute summary
+`arr.sum()`, `arr.mean()`, `arr.min()`, `arr.max()`
+
+8. Axis operations – Row/column aggregation
+`arr.sum(axis=0)` (column), `arr.sum(axis=1)` (row)
+
+9. Filtering – Select values using conditions
+`arr[arr > 10]`
+
+10. Unique values – Get distinct elements
+`np.unique(arr)`
+
+Pandas Cheat-Sheet (Meaning + Formula)
+
+Create & Load
+
+1. Create DataFrame
+`pd.DataFrame(data)`
+
+2. Read files
+`pd.read_csv("file.csv")`, `pd.read_excel("file.xlsx")`
+
+Viewing & Exploring
+
+3. Top/bottom rows
+`df.head()`, `df.tail()`
+
+4. Shape of data
+`df.shape`
+
+5. Summary stats
+`df.describe()`
+
+6. Column info
+`df.info()`
+
+Selecting Data
+
+7. Select column
+`df["col"]` or `df.col`
+
+8. Select rows by index
+`df.loc[rows]` (label), `df.iloc[rows]` (position)
+
+9. Filter rows
+`df[df["col"] > 100]`
+
+Handling Missing Data
+
+10. Drop NA
+`df.dropna()`
+
+11. Fill NA
+`df.fillna(value)`
+
+Data Cleaning
+
+12. Rename columns
+`df.rename(columns={"old":"new"})`
+
+13. Replace values
+`df["col"].replace(old, new)`
+
+14. Convert datatype
+`df["col"] = df["col"].astype("int")`
+
+Aggregations & Grouping
+
+15. Group and aggregate
+`df.groupby("col").agg({"sales":"sum"})`
+
+16. Pivot table
+`df.pivot_table(values, index, columns, aggfunc)`
+
+Merging & Joining
+
+17. Merge two datasets
+`pd.merge(df1, df2, on="id", how="left")`
+
+18. Concatenate vertically/horizontally
+`pd.concat([df1, df2], axis=0/1)`
+
+Sorting
+
+19. Sort rows
+`df.sort_values("col")`
+
+Apply Functions
+
+20. Row/column transformations
+`df["new"] = df["col"].apply(lambda x: x*2)`
+
+Date Operations
+
+21. Convert to datetime
+`pd.to_datetime(df["date"])`
+
+22. Extract year/month/day
+`df["date"].dt.year`, `df["date"].dt.month`
+
+Window Functions
+
+23. Rolling window
+`df["roll"] = df["col"].rolling(3).mean()`
+
+24. Rank rows
+`df["r"] = df["col"].rank()`
+
+Export
+
+25. Save file
+`df.to_csv("out.csv", index=False)`
+
+26. Python Shor Notes
+
+1. Handle Missing Data & Duplicate Data
+
+df.isnull().sum()          # Count nulls per column
+df.dropna()               # Drop rows with missing values
+df.fillna(method='ffill') # Fill missing values
+df.drop_duplicates()      # Remove duplicate rows
+df.replace({'old':'new'}) # Replace values in dataframe
+
+2. Inspect & Understand Your Data
+
+df.head()     # Shows first rows of data frame
+df.info()     # Displays dataframe info and data types
+df.describe() # Shows summary statistics
+
+3. Rename, Convert & Clean Columns
+
+df.rename(columns={'old':'new'}) # Rename columns
+df.astype({'col':'type'})        # Change data type of column
+df.drop(['col'], axis=1)         # Drop one or more columns
+df.reset_index(drop=True)        # Reset index, drop old index
+df.columns.str.strip()           # Strip whitespace from column names
+
+4. Filter, Slice & Select Rows
+
+df.loc[df['col'] > value]               # Filter using condition
+df.iloc[0:5]                            # Select rows by index
+df['col'].isin(['val1','val2'])         # Filter using multiple values
+df.query("col > 10 & col2 == 'yes'")    # Query with expressions
+
+5. Merge & Group Data
+
+pd.concat([df1, df2], axis=0)       # Concatenate rows
+pd.merge(df1, df2, on='key')        # Merge on key
+df.groupby('col').agg({'val':'mean'}) # Group & aggregate
+df['col'].value_counts()            # Frequency of unique values
+df.pivot_table(values, index, columns) # Pivot table 

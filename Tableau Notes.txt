@@ -1,0 +1,414 @@
+✅ 1. JOIN vs BLENDING vs RELATIONSHIP
+
+Blending
+Blending happens at sheet level meaning in one sheet you can have different connection but in other sheet you can have different connection
+The number are aggregated one the basis of primary data source
+Has separate canvas for the different data sources
+Used when data comes from different data sources (SQL + Excel etc).
+No physical join → Tableau matches data on the fly using a common field.
+Primary data source (blue), secondary source (orange).
+Slow because it sends multiple queries.
+
+Joins
+The physical layer
+The tables created from this is a static table
+Way to handle duplication is LODs
+Have a single canvas for the data source
+Happens inside Tableau data model before visualization.
+Combines rows horizontally based on a join condition (A.ID = B.ID).
+Creates one single table.
+Fastest when both tables come from the same database.
+Risk: Can duplicate rows (especially in one-to-many joins).
+
+
+Relationship
+The Logical Layer
+More flexible
+Contextual join
+Have a single canvas but separated by data source within canvas
+Introduced in recent Tableau versions.
+Flexible join → Tableau automatically chooses join type depending on viz.
+Prevents duplication → maintains separate logical tables.
+Best practice for modern dashboards.
+
+Note - Joins are faster. Relationships give flexibility and avoid data duplication, but they add extra query processing, making them slower compared to regular database joins.
+
+
+✅ 2. Ways to Connect to Data Source
+
+Direct Table: Best performance, uses DB pushdown.
+View: Good performance, reusable logic, optimized by DB.
+Custom SQL: Most flexible but slowest; Tableau cannot optimize it.
+Published Data Source: Standardized, governed datasource for org-wide use.
+
+✅ 3. Types of LOD Expressions + Simple Examples
+
+LODs
+Fixed - Static
+Dynamic - Include, Exclude
+
+FIXED - Ignores view level of detail; uses the dimension you mention.
+Example - {FIXED CustomerID : SUM(Sales)}
+→ Sales per customer, even if customer is not in the view.
+
+INCLUDE - Adds extra dimension to the view.
+{INCLUDE Product : SUM(Sales)}
+→ Sales per product even if product is not displayed.
+
+EXCLUDE - Removes a dimension from the view.
+{EXCLUDE Month : SUM(Sales)}
+→ Gives yearly total even when months are visible.
+
+Notes:-
+If we use Exclude LOD, we are going high level of Aggregation and less level of details like from button to top
+If we use Include LOD, we are going lower level of Aggregation and more level of details like from top to bottom
+
+
+✅ 4. Performance differences between connection types
+
+Type Performance Why
+
+Extract ⭐ Fastest Stored in columnar .hyper format
+Database Table View ⭐ Very Good Pre-aggregated by DB
+Database Table Good Query directly
+Live Connection Depends Depends on DB speed
+Custom SQL ❌ Slow Runs whole query every time
+Blending ❌ Slow Multiple queries
+
+✅ 5. Order of Filters in Tableau
+
+1. Extract Filter
+2. Data Source Filter
+3. Context Filter
+4. Dimension Filter
+5. Measure Filter
+6. Table Calculation Filter
+
+✅ 6. Handling NULL values
+
+Z-Null → Show data break
+Hide (exclude)
+Replace using calculated fields
+Use IFNULL(), ZN(), ISNULL()
+Filter NULLs
+
+✅ 7. When we bring multiple tables – join or relationship automatically?
+
+If you drag tables inside the same logical layer → JOIN happens.
+If you drag tables in separate logical layers → RELATIONSHIP happens automatically.
+Tableau never creates blending automatically.
+
+✅ 8. Important Calculated Functions
+
+IF / CASE
+DATE functions (DATEDIFF, DATENAME, DATEPART)
+ZN(), IFNULL()
+WINDOW functions (RUNNING_SUM, WINDOW_AVG)
+RANK()
+LOOKUP()
+
+X + Y math functions
+
+String functions (LEFT, RIGHT, MID)
+LOD expressions
+
+✅ 9. Context Filter
+
+Creates a temporary subset of data.
+All other filters apply on top of this subset.
+Helps improve performance.
+Required for Top N filters based on another dimension.
+
+✅ 10. Parameters
+
+Dynamic user input control
+Parameter can control:
+Filters
+Measures
+Aggregations
+Bins
+Reference lines
+Calculations
+What-if analysis
+
+✅ 11. Sets
+
+Custom grouping based on logic, not simple grouping.
+Dynamic (conditions) or fixed (manual).
+Common use:
+Top/Bottom customers
+Segmentation
+Set Actions for interactivity
+
+✅ 12. Performance Optimizer
+
+Suggests improvements:
+✔ High cardinality fields causing slowness
+✔ Unnecessary joins
+✔ Extract recommended
+✔ Missing context filter
+✔ Heavy table calculations
+
+Shows hints inside Tableau.
+
+✅ 13. Actions
+
+Types:
+
+Filter Action
+Highlight Action
+URL Action
+Go To Sheet/Go To Dashboard
+Change Parameter Action
+Set Action
+
+Used for interactive dashboards.
+
+✅ 14. Feature Table Calculation LOD Expression
+
+Runs on Visualization level Data source level
+Depends on Table layout Data dimension
+Examples Running sum, Rank Fixed, Include, Exclude
+Computed After all filters Before dimension filters
+
+✅ 15. Row-Level Security (RLS)
+
+How to implement?
+
+Method 1 — User Filter
+Map user → allowed values.
+
+Method 2 — Entitlement Table (Best Practice)
+Create a table like:
+User Region
+
+A West
+B East
+
+Join with fact → publish on Tableau Server → enable "Login-based filtering".
+
+✅ 16. Extract vs Data Source Filter
+
+Filter Type Purpose
+
+Extract Filter Reduces data before extract is created
+Data Source Filter Applies on the whole data source even in Live
+
+✅ 17. Measure Names & Measure Values
+
+Tableau stores all numeric fields under Measure Values shelf.
+Measure Names = headers of numeric columns.
+Useful for:
+Combined charts
+KPIs
+Tables with multiple metrics
+
+✅ 18. Table Calculations
+
+RUNNING_SUM()
+Meaning:-
+Adds values row by row (cumulative sum).
+Formula:-
+RUNNING_SUM(SUM([Sales]))
+Example:-
+If sales = 10, 20, 30 → Running sum = 10, 30, 60.
+Use Case:-
+Cumulative totals, YTD metrics, progressive growth.
+
+2 - RUNNING_AVG()
+Meaning:-
+Average of all rows from start till the current row.
+Formula:-
+RUNNING_AVG(SUM([Sales]))
+Example:-
+Sales = 10, 20, 30 → Running avg = 10, 15, 20.
+Use Case:-
+Trend smoothing over time.
+
+3- LOOKUP()
+Meaning:-
+Fetches a value from a previous or next row.
+Formula:-
+LOOKUP(SUM([Sales]), -1)   // previous row
+LOOKUP(SUM([Sales]), 1)    // next row
+Example:-
+Use to compare current month vs previous month.
+Use Case:-
+Month-over-month change, difference from previous row.
+
+4 - WINDOW_SUM() / WINDOW_AVG()
+Meaning:-
+Performs calculation over a **window (range of rows)**, not cumulative.
+Formulas:-
+WINDOW_SUM(SUM([Sales]))
+WINDOW_AVG(SUM([Sales]))
+Example:-
+If your window is last 3 months → rolling 3-month total or average.
+Use Cas:-
+Moving averages, rolling totals, sliding windows.
+
+5 - PERCENT_OF_TOTAL()
+
+Meaning:-
+Shows each row/value as a percentage of the entire total.
+Formula:-
+SUM([Sales]) / WINDOW_SUM(SUM([Sales]))
+Example:-
+Category A = 40, B = 60
+A% = 40/100 = 40%
+B% = 60/100 = 60%.
+Use Case:-
+Contribution analysis (category share, market share).
+
+6 - RANK()
+Meaning:-
+Ranks the values in ascending or descending order.
+Formula:-
+RANK(SUM([Sales]), 'desc')
+Example:-
+Sales: 100, 80, 50 → Rank = 1, 2, 3.
+Use Case:-
+Top N customers, top products, performance ranking.
+
+7 - INDEX()
+Meaning:-
+Gives the **row number** in the partition.
+Formula:-
+INDEX()
+Example:-
+Rows → 1, 2, 3, 4…
+Use Case:-
+Creating row numbers
+Pagination setups
+Filtering based on row number (Top N).
+
+A single-line cheat sheet:-
+
+| Calculation          | Simple Meaning               | Example Formula                           |
+| -------------------- | ---------------------------- | ----------------------------------------- |
+| **RUNNING_SUM**      | Cumulative total             | `RUNNING_SUM(SUM([Sales]))`               |
+| **RUNNING_AVG**      | Cumulative average           | `RUNNING_AVG(SUM([Sales]))`               |
+| **LOOKUP**           | Current vs previous/next row | `LOOKUP(SUM([Sales]), -1)`                |
+| **WINDOW_SUM**       | Rolling total in a window    | `WINDOW_SUM(SUM([Sales]))`                |
+| **WINDOW_AVG**       | Rolling average in a window  | `WINDOW_AVG(SUM([Sales]))`                |
+| **PERCENT_OF_TOTAL** | Row % of total               | `SUM([Sales]) / WINDOW_SUM(SUM([Sales]))` |
+| **RANK**             | Rank values                  | `RANK(SUM([Sales]), 'desc')`              |
+| **INDEX**            | Row number                   | `INDEX()`                                 |
+
+
+✅ 19. Set vs Group
+
+Feature Set Group
+
+Dynamic? Yes No
+Based on condition? Yes No
+Use case Segmentation Clean categories
+
+✅ 20. Security in Tableau
+
+Authentication (AD, SAML, OAuth)
+Authorization (project-level, workbook-level, view-level permissions)
+Row-Level Security
+Data source security
+Extract encryption
+Server-level permissions
+
+✅ 21. Advanced Analytics
+
+Forecasting - Predicts future values using exponential smoothing based on historical trends and seasonality.
+Clustering - Groups similar data points using k-means to identify segments or patterns.
+Trend Lines - Shows the direction and strength of relationships using linear or other regression models.
+Box Plots - Displays data distribution with median, quartiles, and outliers.
+R & Python Integration - Runs external R/Python scripts inside Tableau for advanced statistical or ML calculations.
+TabPy / Einstein Integration - TabPy enables Python-based analytics; Einstein adds AI-driven predictions and insights from Salesforce.
+Statistical Models (Regression visuals) - Visualizes variable relationships using regression lines, R², and significance indicators.
+
+
+✅ 22. Tableau Server
+
+1. What is Tableau Server?
+A platform to publish, share, schedule, and manage Tableau dashboards securely for enterprise use.
+
+2. Key components of Tableau Server?
+Gateway, VizQL Server, Application Server, Data Engine, Backgrounder, Repository.
+
+3. What is the role of Backgrounder?
+Runs extract refreshes, subscriptions, and scheduled tasks.
+
+4. Difference between Live and Extract on Server?
+Live:Real-time query to database.
+Extract:Cached data, faster, supports scheduling.
+
+5. How do you manage permissions?**
+Set at project/workbook/view/data source levels; deny overrides allow.
+
+6. What authentication methods are supported?
+AD/LDAP, SAML, Kerberos, OAuth.
+
+7. How do you implement Row Level Security (RLS)?
+Use user filters or entitlement tables linked with usernames from Tableau Server.
+
+8. How do you monitor performance?
+Use Admin Views or query the Tableau Server Repository (Postgres DB)
+
+9. What is High Availability (HA) in Tableau Server?
+Multi-node setup with redundant repository and clustered components for failover and performance.
+
+10. How do you perform backup & restore?
+Backup:`tsm maintenance backup`.
+Restore:`tsm maintenance restore`.
+
+11. What is VizQL Server?
+Processes queries and renders visualizations for users.
+
+12. How do you improve server performance?
+Use **extracts**, optimize queries, reduce filters, increase hardware resources, and monitor background tasks.
+
+✅ 23. Tableau Online
+
+Cloud version of Tableau Server
+No admin-level installation needed
+Auto-scaling, auto-backup
+Same features as Server but fully cloud managed
+
+✅ 24. Incremental Refresh & Initial SQL
+
+Incremental Refresh
+
+Refresh only new rows.
+Requires a column like date/id to detect new records.
+
+
+Initial SQL
+
+Runs automatically before Tableau queries:
+Set session variables
+Temp tables
+Filters
+Security contexts
+
+✅ 25. Union
+
+Combine tables vertically.
+Same columns required.
+Example:
+Jan.xlsx + Feb.xlsx + Mar.xlsx
+Tableau auto-aligns columns.
+
+✅ 26. Tableau Prep Important Concepts
+
+Input → Clean → Join → Union → Aggregate → Output
+Smart cleaning
+Pivot & Unpivot
+Regex cleaning
+Fuzzy matching
+Data shaping
+Prep Conductor (for automation)
+
+
+
+ 
+
+
+
+
